@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function TimeString(time) {
     const currentDate = new Date();
