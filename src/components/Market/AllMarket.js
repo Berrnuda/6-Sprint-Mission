@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import "../style/allMarket.css";
-import LinkButton from "../common/Button";
-import HeartIcon from "../assets/icon/ic_heart.svg";
-import Arrow_left from "../assets/icon/ic_arrow_left.svg";
-import Arrow_right from "../assets/icon/ic_arrow_right.svg";
+import "../../style/allMarket.css";
+import LinkButton from "../../common/Button";
+import HeartIcon from "../../assets/icon/ic_heart.svg";
+import Arrow_left from "../../assets/icon/ic_arrow_left.svg";
+import Arrow_right from "../../assets/icon/ic_arrow_right.svg";
 import { Link } from "react-router-dom";
 import { SearchInput } from "./SearchInput";
-import Commas from "../util/Commas";
+import Commas from "../../util/Commas";
 import SelectBtn from "./SelectBtn";
-import { getMarketData } from "./API";
+import { getMarketData } from "../utils/API";
 import { useMediaQuery } from "react-responsive";
 
 export default function AllMarket() {

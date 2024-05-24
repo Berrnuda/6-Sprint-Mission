@@ -1,7 +1,7 @@
-import "../style/additem.css";
+import "../../style/additem.css";
 import { useCallback, useEffect, useState } from "react";
-import ic_x_gray from "../assets/icon/ic_x_gray.svg";
-import ic_x_blue from "../assets/icon/ic_x_blue.svg";
+import ic_x_gray from "../../assets/icon/ic_x_gray.svg";
+import ic_x_blue from "../../assets/icon/ic_x_blue.svg";
 
 export default function AddItem() {
   const [imageSrc, setImageSrc] = useState("");

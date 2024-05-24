@@ -1,4 +1,4 @@
-import Product from "../components/Product";
+import Product from "../components/Product/Product";
 import NavBar from "../components/header";
 
 export default function ProductPage() {

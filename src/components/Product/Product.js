@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import "../style/product.css";
-import HeartIcon from "../assets/icon/ic_heart.svg";
-import { getProductData, getProductCommentData } from "./API";
+import "../../style/product.css";
+import HeartIcon from "../../assets/icon/ic_heart.svg";
+import { getProductData, getProductCommentData } from "../utils/API";
 import { Link, useParams } from "react-router-dom";
-import Commas from "../util/Commas";
-import TimeString from "../util/times";
-import inquiry_empty from "../assets/img/img_inquiry_empty.svg";
-import ic_back from "../assets/icon/ic_back.svg";
+import Commas from "../../util/Commas";
+import TimeString from "../../util/times";
+import inquiry_empty from "../../assets/img/img_inquiry_empty.svg";
+import ic_back from "../../assets/icon/ic_back.svg";
 
 export default function Product() {
   const [productData, setProductData] = useState(null);

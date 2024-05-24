@@ -28,7 +28,7 @@ export default function NavBar() {
           <span>중고마켓</span>
         </Link>
       </div>
-      <LinkButton to="/">로그인</LinkButton>
+      <LinkButton to="/signin">로그인</LinkButton>
     </nav>
   );
 }

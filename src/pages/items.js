@@ -1,5 +1,5 @@
 import NavBar from "../components/header";
-import AddItem from "../components/AddItem";
+import AddItem from "../components/AddItems/AddItem";
 import "../style/additem.css";
 
 export default function ItemPage() {

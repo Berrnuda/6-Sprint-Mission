@@ -1,5 +1,5 @@
-import AllMarket from "../components/AllMarket";
-import BestMarket from "../components/BestMarket";
+import AllMarket from "../components/Market/AllMarket";
+import BestMarket from "../components/Market/BestMarket";
 import NavBar from "../components/header";
 import "../style/market.css";
 

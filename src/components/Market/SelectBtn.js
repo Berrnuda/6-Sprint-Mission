@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import "../style/SelectBtn.css";
-import ArrowDownIcon from "../assets/icon/ic_arrow_down.svg";
-import sortBtn from "../assets/icon/ic_sort.svg";
+import "../../style/SelectBtn.css";
+import ArrowDownIcon from "../../assets/icon/ic_arrow_down.svg";
+import sortBtn from "../../assets/icon/ic_sort.svg";
 import { useMediaQuery } from "react-responsive";
 
 export default function SelectBtn({ onChange }) {
