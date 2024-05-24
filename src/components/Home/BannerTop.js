@@ -1,17 +1,16 @@
-import React from "react";
-
-export default function BannerTop() {
-  return (
-    <section className="banner-top">
-      <div>
-        <h1>
-          일상의 모든 물건을 <br />
-          거래해보세요
-        </h1>
-        <a href="items.html" className="btn-items btn">
-          구경하러가기
-        </a>
-      </div>
-    </section>
-  );
-}
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const react_1 = __importDefault(require("react"));
+const BannerTop = () => {
+    return (react_1.default.createElement("section", { className: "banner-top" },
+        react_1.default.createElement("div", null,
+            react_1.default.createElement("h1", null,
+                "\uC77C\uC0C1\uC758 \uBAA8\uB4E0 \uBB3C\uAC74\uC744 ",
+                react_1.default.createElement("br", null),
+                "\uAC70\uB798\uD574\uBCF4\uC138\uC694"),
+            react_1.default.createElement("a", { href: "items.html", className: "btn-items btn" }, "\uAD6C\uACBD\uD558\uB7EC\uAC00\uAE30"))));
+};
+exports.default = BannerTop;
