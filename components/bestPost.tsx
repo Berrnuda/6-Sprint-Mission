@@ -62,7 +62,7 @@ export default function BestPost() {
   return (
     <>
       {bestPosts.map((item) => (
-        <Link key={item.id} href={`/post/${item.id}`}>
+        <Link key={item.id} href={`/boards/${item.id}`}>
           <div className={style.BestContainer} >
             <div className={style.BestBadge}>
               <Image

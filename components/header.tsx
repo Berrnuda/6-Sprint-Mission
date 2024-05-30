@@ -31,7 +31,7 @@ const NavBar: React.FC = () => {
       <div className={styles.menus}>
         <Link
           href="/boards"
-          className={router.pathname === "/boards" ? styles.focus : ""}
+          className={router.pathname.startsWith("/boards") ? styles.focus : ""}
         >
           <span>자유게시판</span>
         </Link>

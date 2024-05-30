@@ -26,7 +26,7 @@ interface PostsProps {
 
 export default function Posts({ posts }: PostsProps) {
   return (
-    <Link href={`/post/${posts.id}`}>
+    <Link href={`/boards/${posts.id}`}>
       <div key={posts.id} className={styles.postContainer}>
         <div className={styles.postsTop}>
           <span className={styles.postsTitle}>{posts.title}</span>
