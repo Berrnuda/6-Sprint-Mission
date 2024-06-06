@@ -79,6 +79,7 @@
 .viewAddBtnContainer {
   display: flex;
   justify-content: flex-end;
+  margin-bottom: 30px;
 }
 
 .viewAddBtn {
@@ -114,6 +115,7 @@
   display: flex;
   justify-content: space-between;
 }
+
 
 .commentContent {
   font-weight: 400;
