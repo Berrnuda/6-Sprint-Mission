@@ -1,76 +1,92 @@
 import { useRouter } from "next/router";
 import styles from "@/styles/post.module.css";
 import axios from "@/utils/axios";
-import { useEffect, useState } from "react";
 import ViewHr from "@/public/icon/view_hr.svg";
 import heartImg from "@/public/icon/ic_heart.svg";
 import user_icon from "@/public/icon/user_icon.svg";
 import Image from "next/image";
 import timeString from "@/utils/timeString";
-import Comment from "@/components/comment";
+import Comment from "@/components/boards/id/comment";
+import getUser from "@/utils/getUser";
+import { GetServerSideProps } from "next";
+import { useState } from "react";
+import { PostViewProps, getUserData, getUserMessage } from "@/types";
+import Link from "next/link";
+import ic_back from "@/public/icon/ic_back.png";
+import reply_empty from "@/public/icon/img_reply_empty.svg";
 
-interface Article {
-  id: number;
-  title: string;
-  content: string;
-  image: string | null;
-  likeCount: number;
-  createdAt: string;
-  updatedAt: string;
-  writer: ArticleWriter;
-  isLiked: boolean;
-}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.query;
 
-interface ArticleWriter {
-  id: number;
-  nickname: string;
-}
+  try {
+    const [articleRes, commentsRes] = await Promise.all([
+      axios.get(`/articles/${id}`),
+      axios.get(`/articles/${id}/comments?limit=99`),
+    ]);
 
-interface Comments {
-  id: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  writer: CommentsWriter;
-}
+    return {
+      props: {
+        article: articleRes.data,
+        comments: commentsRes.data.list ?? [],
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return {
+      notFound: true,
+    };
+  }
+};
 
-interface CommentsWriter {
-  id: number;
-  nickname: string;
-  image: string | null;
-}
+export default function PostView({ article, comments }: PostViewProps) {
+  const [newComment, setNewComment] = useState<string>("");
 
-export default function PostView() {
-  const [article, setArticle] = useState<Article | null>();
-  const [comments, setComments] = useState<Comments[]>([]);
+  const accessToken =
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
   const router = useRouter();
   const id = router.query["id"];
 
-  async function getArticle() {
+  async function postComment() {
+    if (accessToken === null) {
+      return alert("로그인 ㄱ");
+    } else if (newComment === "") {
+      return alert("댓글작성 ㄱ");
+    } else if (newComment.length <= 2) {
+      return alert("좀만 더 길게 작성 ㄱ");
+    }
+
     try {
-      const res = await axios.get(`/articles/${id}`);
-      if (res.data && !res.data.message) {
-        setArticle(res.data);
-      } else {
-        console.log(res.data.message);
+      const userData = await getUser(accessToken);
+
+      if (!userData || (userData as getUserMessage).message) {
+        alert("다시 로그인 ㄱ");
+        router.push("/mypage");
+        return;
+      }
+
+      if ((userData as getUserData).nickname) {
+        const res = await axios.post(
+          `/articles/${id}/comments`,
+          {
+            content: newComment,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        router.push(`/boards/${id}`);
+
+        setNewComment("");
       }
     } catch (error) {
-      console.log(error);
+      console.log("댓글을 작성하는 중 오류가 발생했습니다.", error);
+      alert("로그인 다시 ㄱ");
     }
   }
-
-  async function getComments() {
-    const res = await axios.get(`/articles/${id}/comments?limit=99`);
-    setComments(res.data.list ?? []);
-  }
-
-  useEffect(() => {
-    if (id) {
-      getArticle();
-      getComments();
-    }
-  }, [id]);
 
   return (
     article && (
@@ -78,7 +94,7 @@ export default function PostView() {
         <div className={styles.viewPostTop}>
           <span className={styles.viewPostTitle}>{article.title}</span>
           <div className={styles.viewPostInfo}>
-              <Image width={24} height={24} alt="프로필사진" src={user_icon} />
+            <Image width={24} height={24} alt="프로필사진" src={user_icon} />
             <span className={styles.Writer}>{article.writer.nickname}</span>
             <span className={styles.times}>
               {timeString(article.createdAt)}
@@ -88,20 +104,66 @@ export default function PostView() {
             <span className={styles.LikeCount}>{article.likeCount}</span>
           </div>
           <div className={styles.viewPostDes}>
+            {article.image && (
+              <Image width={512} height={512} src={article.image} alt="zzz" />
+            )}
+            <br></br>
             <span className={styles.viewPostContent}>{article.content}</span>
           </div>
         </div>
         <div className={styles.viewPostMiddle}>
           <span className={styles.viewAddText}>댓글 달기</span>
-          <textarea className={styles.viewAddContent}></textarea>
+          <textarea
+            className={styles.viewAddContent}
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="댓글을 입력해주세요."
+          ></textarea>
           <div className={styles.viewAddBtnContainer}>
-            <button className={styles.viewAddBtn}>등록</button>
+            <button
+              className={`${styles.viewAddBtn} ${
+                newComment === "" ? "" : styles.active
+              }`}
+              onClick={postComment}
+            >
+              등록
+            </button>
           </div>
         </div>
         <div className={styles.viewPostBottom}>
-          {comments.map((comment) => (
-            <Comment comment={comment} key={comment.id} />
-          ))}
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <Comment comment={comment} key={comment.id} />
+            ))
+          ) : (
+            <div className={styles.commentEmptyContainer}>
+              <Image
+                width={140}
+                height={140}
+                src={reply_empty}
+                alt="no comment"
+              />
+              <p>
+                아직 댓글이 없어요,
+                <br />
+                지금 댓글을 달아보세요!
+              </p>
+            </div>
+          )}
+        </div>
+        <div className={styles.backContainer}>
+          <div>
+            <Link href="/boards" className={styles.backBtn}>
+              목록으로 돌아가기
+            </Link>
+            <Image
+              width={24}
+              height={24}
+              src={ic_back}
+              alt="back to items"
+              className={styles.backImg}
+            />
+          </div>
         </div>
       </div>
     )
