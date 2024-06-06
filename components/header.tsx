@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MainLogo from "@/public/icon/main_logo.svg";
 import SmallMainLogo from "@/public/icon/main_logo_small.svg";
 import Link from "next/link";
@@ -9,6 +9,8 @@ import user_icon from "@/public/icon/user_icon.svg";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
+  
+  const accessToken = typeof window !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
   return (
     <nav className={styles.navvar}>
@@ -36,15 +38,21 @@ const NavBar: React.FC = () => {
           <span>자유게시판</span>
         </Link>
         <Link
-          href="/items"
+          href="/"
           className={router.pathname === "/items" ? styles.focus : ""}
         >
           <span>중고마켓</span>
         </Link>
       </div>
-      <Link href="/mypage">
-        <Image width={40} height={40} alt="user-icon" src={user_icon} />
-      </Link>
+      {accessToken === null ? (
+        <Link href="/signin">
+          <span>로그인</span>
+        </Link>
+      ) : (
+        <Link href="/mypage">
+          <Image width={40} height={40} alt="user-icon" src={user_icon} />
+        </Link>
+      )}
     </nav>
   );
 };

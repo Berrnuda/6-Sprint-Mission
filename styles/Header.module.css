@@ -12,6 +12,7 @@
   background-color: #ffffff;
   border-bottom: 1px solid #dfdfdf;
   z-index: 9999;
+  min-width: 385px;
 }
 
 .menus {
