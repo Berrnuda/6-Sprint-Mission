@@ -1,7 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "@/styles/commentMoreButton.module.css";
 
-const MoreOptionsButton: React.FC = () => {
+interface MoreOptionsButtonProps {
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+const MoreOptionsButton: React.FC<MoreOptionsButtonProps> = ({
+  onEdit,
+  onDelete,
+}) => {
   const [showOptions, setShowOptions] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -26,18 +34,16 @@ const MoreOptionsButton: React.FC = () => {
   }, []);
 
   return (
-    <div ref={optionsRef} >
-      <div className={styles.moreOptionsButton}>
+    <div className={styles.moreOptionsButton} ref={optionsRef}>
       <button onClick={toggleOptions} className={styles.moreOptionsIcon}>
         &#x22EE;
       </button>
       {showOptions && (
         <div className={styles.options}>
-          <button>수정하기</button>
-          <button>삭제하기</button>
+          <button onClick={onEdit}>수정하기</button>
+          <button onClick={onDelete}>삭제하기</button>
         </div>
       )}
-    </div>
     </div>
   );
 };

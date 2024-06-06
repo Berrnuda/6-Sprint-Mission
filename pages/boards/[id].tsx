@@ -88,6 +88,43 @@ export default function PostView({ article, comments }: PostViewProps) {
     }
   }
 
+  async function handleEditClick(id: number) {}
+
+  async function handleDeleteClick(id: number) {
+    if (accessToken === null) {
+      return alert("로그인 ㄱ");
+    }
+
+    try {
+      const userData = await getUser(accessToken);
+
+      if (!userData || (userData as getUserMessage).message) {
+        alert("다시 로그인 ㄱ");
+        router.push("/mypage");
+        return;
+      }
+
+      if ((userData as getUserData).nickname) {
+        const res = await axios.delete(`/comments/${id}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (res.status === 200) {
+          alert("삭제 완료");
+          router.push(`/boards/${id}`);
+        }
+      }
+    } catch (error: any) {
+      if (error.response.status === 401 || error.response.status === 403) {
+        alert("권한 ㄴ");
+        router.reload();
+        return;
+      }
+    }
+  }
+
   return (
     article && (
       <div className={styles.viewBestContainer}>
@@ -133,7 +170,12 @@ export default function PostView({ article, comments }: PostViewProps) {
         <div className={styles.viewPostBottom}>
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <Comment comment={comment} key={comment.id} />
+              <Comment
+                comment={comment}
+                key={comment.id}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+              />
             ))
           ) : (
             <div className={styles.commentEmptyContainer}>
