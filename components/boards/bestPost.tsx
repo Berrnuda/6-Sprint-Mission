@@ -7,25 +7,10 @@ import Image from "next/image";
 import timeString from "@/utils/timeString";
 import { useMediaQuery } from "react-responsive";
 import Link from "next/link";
-
-interface List {
-  id: number;
-  title: string;
-  content: string;
-  image: null | string;
-  likeCount: number;
-  createdAt: string;
-  updatedAt: string;
-  writer: Writer;
-}
-
-interface Writer {
-  id: number;
-  nickname: string;
-}
+import { ArticlesList } from "@/types";
 
 export default function BestPost() {
-  const [bestPosts, setBestPosts] = useState<List[]>([]);
+  const [bestPosts, setBestPosts] = useState<ArticlesList[]>([]);
 
   const isTablet = useMediaQuery({
     query: `(max-width: 1024px)`,

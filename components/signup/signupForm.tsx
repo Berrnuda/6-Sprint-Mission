@@ -6,7 +6,7 @@ import Image from "next/image";
 import styles from "@/styles/signup.module.css";
 import axios from "@/utils/axios";
 
-export default function SignupForm() {
+export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [nickname, setNickname] = useState("");

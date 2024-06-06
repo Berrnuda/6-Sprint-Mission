@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import styles from '@/styles/signup.module.css';
 import SocialLogin from '@/components/socialLogin';
-import SignupForm from '@/components/signup/signupForm';
+import SignUpForm from '@/components/signup/signupForm';
 
 export default function SignUp() {
   return (
@@ -14,7 +14,7 @@ export default function SignUp() {
           <Image src={pandaLogo} alt="판다마켓" width={396} />
         </Link>
       </div>
-      <SignupForm />
+      <SignUpForm />
       <SocialLogin />
       <div className={styles.switch_signup}>
         이미 회원이신가요? <Link href="/signin">로그인</Link>

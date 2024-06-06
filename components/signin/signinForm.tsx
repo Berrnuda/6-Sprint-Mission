@@ -6,27 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import axios from "@/utils/axios";
 
-interface postProps {
-  email: string;
-  password: string;
-}
-
-interface LoginData {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface User {
-  id: number;
-  nickname: string;
-  image: null;
-  createdAt: string;
-  updatedAt: string;
-  email: string;
-}
-
-export default function SigninForm() {
+export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");

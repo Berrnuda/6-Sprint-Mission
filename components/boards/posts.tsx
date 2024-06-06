@@ -4,25 +4,9 @@ import heartImg from "@/public/icon/ic_heart.svg";
 import timeString from "@/utils/timeString";
 import user_icon from "@/public/icon/user_icon.svg";
 import Link from "next/link";
+import { PostsProps } from "@/types";
 
-interface List {
-  id: number;
-  title: string;
-  content: string;
-  image: null | string;
-  likeCount: number;
-  createdAt: string;
-  updatedAt: string;
-  writer: Writer;
-}
-interface Writer {
-  id: number;
-  nickname: string;
-}
 
-interface PostsProps {
-  posts: List;
-}
 
 export default function Posts({ posts }: PostsProps) {
   return (

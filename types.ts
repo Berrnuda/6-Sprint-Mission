@@ -78,3 +78,27 @@ export interface ArticlesList {
     article: Article | null;
     comments: Comments[];
   }
+
+  export interface CommentProps {
+    comment: Comments;
+  }
+
+  export interface postProps {
+    email: string;
+    password: string;
+  }
+  
+  export interface LoginData {
+    user: UserProps;
+    accessToken: string;
+    refreshToken: string;
+  }
+  
+  export interface UserProps {
+    id: number;
+    nickname: string;
+    image: null;
+    createdAt: string;
+    updatedAt: string;
+    email: string;
+  }

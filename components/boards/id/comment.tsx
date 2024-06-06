@@ -2,24 +2,7 @@ import styles from "@/styles/post.module.css";
 import Image from "next/image";
 import user_icon from "@/public/icon/user_icon.svg";
 import TimeToBefore from "@/utils/timeToBefore";
-
-interface Comments {
-  id: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  writer: CommentsWriter;
-}
-
-interface CommentsWriter {
-  id: number;
-  nickname: string;
-  image: string | null;
-}
-
-interface CommentProps {
-  comment: Comments;
-}
+import { CommentProps } from "@/types";
 
 export default function Comment({ comment }: CommentProps) {
   return (
