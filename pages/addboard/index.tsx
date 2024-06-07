@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import axios from "@/utils/axios";
@@ -17,34 +17,33 @@ export default function AddArticlePage() {
   const [imgUrl, setImgUrl] = useState<string>("");
 
   const router = useRouter();
-  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const accessToken =
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
-  const handleInputChange = useCallback(() => {
+  useEffect(() => {
     setIsAllInputFilled(inputTitle.trim() !== "" && inputDes.trim() !== "");
   }, [inputTitle, inputDes]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputTitle(e.target.value);
-    handleInputChange();
   };
 
   const handleDesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputDes(e.target.value);
-    handleInputChange();
   };
 
   const getImageUrl = async (file: File) => {
     if (!accessToken) {
-      return alert("로그인 ㄱ");
+      alert("로그인 해주세요.");
+      return router.push("/signin");
     }
 
     try {
       const userData = await getUser(accessToken);
 
       if (!userData || (userData as getUserMessage).message) {
-        alert("다시 로그인 ㄱ");
-        router.push("/mypage");
-        return;
+        alert("다시 로그인 해주세요.");
+        return router.push("/mypage");
       }
 
       const formData = new FormData();
@@ -59,11 +58,14 @@ export default function AddArticlePage() {
 
       setImgUrl(res.data.url);
     } catch (e) {
-      console.log(e);
+      console.error("이미지 업로드 실패:", e);
+      alert(`이미지 업로드 실패: ${e}`);
     }
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       await getImageUrl(file);
@@ -83,14 +85,14 @@ export default function AddArticlePage() {
 
   const handleSubmitClick = async () => {
     if (!accessToken) {
-      return alert("로그인 ㄱ");
+      return alert("로그인 해주세요.");
     }
 
     try {
       const userData = await getUser(accessToken);
 
       if (!userData || (userData as getUserMessage).message) {
-        alert("다시 로그인 ㄱ");
+        alert("다시 로그인 해주세요.");
         router.push("/mypage");
         return;
       }
@@ -107,8 +109,8 @@ export default function AddArticlePage() {
 
       router.push(`/boards/${res.data.id}`);
     } catch (error) {
-      console.log(error);
-      alert("로그인 다시 ㄱ");
+      console.error("게시글 등록 실패:", error);
+      alert("다시 로그인 해주세요.");
     }
   };
 
