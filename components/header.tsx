@@ -9,8 +9,11 @@ import user_icon from "@/public/icon/user_icon.svg";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
-  
-  const accessToken = typeof window !== 'undefined' ? localStorage.getItem("accessToken") : null;
+
+  const accessToken =
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const profileImg =
+    typeof window !== "undefined" ? localStorage.getItem("profileImg") : null;
 
   return (
     <nav className={styles.navvar}>
@@ -48,9 +51,13 @@ const NavBar: React.FC = () => {
         <Link href="/signin">
           <span>로그인</span>
         </Link>
-      ) : (
+      ) : profileImg === null ? (
         <Link href="/mypage">
           <Image width={40} height={40} alt="user-icon" src={user_icon} />
+        </Link>
+      ) : (
+        <Link href="/mypage">
+          <Image width={40} height={40} alt="user-icon" src={profileImg} />
         </Link>
       )}
     </nav>

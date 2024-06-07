@@ -5,7 +5,7 @@ import TimeToBefore from "@/utils/timeToBefore";
 import { CommentProps } from "@/types";
 import MoreOptionsButton from "./commentMoreButton";
 
-export default function Comment({ comment, onEdit, onDelete }: CommentProps) {
+export default function Comment({ comment, onEdit, onDelete, isEdit }: CommentProps) {
   return (
     <div className={styles.commentContainer}>
       <div className={styles.commentContentContainer}>

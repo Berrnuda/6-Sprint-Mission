@@ -40,6 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function PostView({ article, comments }: PostViewProps) {
   const [newComment, setNewComment] = useState<string>("");
+  const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const accessToken =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -88,7 +89,9 @@ export default function PostView({ article, comments }: PostViewProps) {
     }
   }
 
-  async function handleEditClick(id: number) {}
+  async function handleEditClick(id: number) {
+    setIsEdit((prev) => !prev);
+  }
 
   async function handleDeleteClick(id: number) {
     if (accessToken === null) {
@@ -118,9 +121,7 @@ export default function PostView({ article, comments }: PostViewProps) {
       }
     } catch (error: any) {
       if (error.response.status === 401 || error.response.status === 403) {
-        alert("권한 ㄴ");
-        router.reload();
-        return;
+        return alert("권한 ㄴ");
       }
     }
   }
@@ -173,6 +174,7 @@ export default function PostView({ article, comments }: PostViewProps) {
               <Comment
                 comment={comment}
                 key={comment.id}
+                isEdit={isEdit}
                 onEdit={handleEditClick}
                 onDelete={handleDeleteClick}
               />

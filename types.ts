@@ -83,6 +83,7 @@ export interface CommentProps {
   comment: Comments;
   onEdit: (commentId: number) => void;
   onDelete: (commentId: number) => void;
+  isEdit: boolean;
 }
 
 export interface postProps {

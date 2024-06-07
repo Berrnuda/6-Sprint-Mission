@@ -22,6 +22,8 @@ export default function SignInForm() {
       });
       const accessToken = res.data.accessToken;
       localStorage.setItem("accessToken", accessToken);
+      const profileImg = res.data.user.image;
+      localStorage.setItem("profileImg", profileImg);
       alert("로그인 성공");
       router.push("/boards");
     } catch (error) {

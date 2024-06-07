@@ -5,7 +5,7 @@ import pandaLogo from "@/public/icon/panda_logo.svg";
 import SocialLogin from "@/components/socialLogin";
 import SignInForm from "@/components/signin/signinForm";
 
-export default function SigIn() {
+export default function SignIn() {
   return (
     <div className={styles.signin_container}>
       <Link href="/" className={styles.signin_logo}>
