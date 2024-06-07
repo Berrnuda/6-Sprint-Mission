@@ -185,3 +185,26 @@
 .userImg {
     border-radius: 50%;
 }
+
+.commentEditContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.commentEditActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* .commentEditActions button {
+  height: 42px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 12px 23px;
+  width: max-content;
+  background-color: #9ca3af;
+  color: #fff;
+} */

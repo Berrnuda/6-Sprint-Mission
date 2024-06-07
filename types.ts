@@ -81,9 +81,11 @@ export interface PostViewProps {
 
 export interface CommentProps {
   comment: Comments;
-  onEdit: (commentId: number) => void;
-  onDelete: (commentId: number) => void;
   isEdit: boolean;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  onCancelEdit: () => void;
+  onSaveEdit: (id: number, newContent: string) => void;
 }
 
 export interface postProps {
@@ -104,4 +106,16 @@ export interface UserProps {
   createdAt: string;
   updatedAt: string;
   email: string;
+}
+
+export interface WriterType {
+  nickname: string;
+  image: string | null; 
+}
+
+export interface CommentType {
+  id: number;
+  content: string;
+  createdAt: string;
+  writer: WriterType;
 }

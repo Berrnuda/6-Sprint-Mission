@@ -1,20 +1,20 @@
 import { useRouter } from "next/router";
-import styles from "@/styles/post.module.css";
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import axios from "@/utils/axios";
+import timeString from "@/utils/timeString";
+import getUser from "@/utils/getUser";
+import Comment from "@/components/boards/id/comment";
+import styles from "@/styles/post.module.css";
+import ic_back from "@/public/icon/ic_back.png";
+import user_icon from "@/public/icon/user_icon.svg";
 import ViewHr from "@/public/icon/view_hr.svg";
 import heartImg from "@/public/icon/ic_heart.svg";
-import user_icon from "@/public/icon/user_icon.svg";
-import Image from "next/image";
-import timeString from "@/utils/timeString";
-import Comment from "@/components/boards/id/comment";
-import getUser from "@/utils/getUser";
-import { GetServerSideProps } from "next";
-import { useState } from "react";
-import { PostViewProps, getUserData, getUserMessage } from "@/types";
-import Link from "next/link";
-import ic_back from "@/public/icon/ic_back.png";
 import reply_empty from "@/public/icon/img_reply_empty.svg";
 import nullImg from "@/public/icon/null.png";
+import { GetServerSideProps } from "next";
+import { PostViewProps, getUserData, getUserMessage } from "@/types";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
@@ -41,16 +41,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function PostView({ article, comments }: PostViewProps) {
   const [newComment, setNewComment] = useState<string>("");
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-
-  const accessToken =
-    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const [isEdit, setIsEdit] = useState<number | null>(null);
+  const [editedComments, setEditedComments] = useState(comments);
 
   const router = useRouter();
   const id = router.query["id"];
+  const accessToken =
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
   async function postComment() {
-    if (accessToken === null) {
+    if (!accessToken) {
       return alert("로그인 ㄱ");
     } else if (newComment === "") {
       return alert("댓글작성 ㄱ");
@@ -70,32 +70,33 @@ export default function PostView({ article, comments }: PostViewProps) {
       if ((userData as getUserData).nickname) {
         const res = await axios.post(
           `/articles/${id}/comments`,
-          {
-            content: newComment,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
+          { content: newComment },
+          { headers: { Authorization: `Bearer ${accessToken}` } }
         );
 
-        router.push(`/boards/${id}`);
-
+        setEditedComments((prevComments) => [
+          ...prevComments,
+          res.data,
+        ]);
         setNewComment("");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log("댓글을 작성하는 중 오류가 발생했습니다.", error);
+      
       alert("로그인 다시 ㄱ");
     }
   }
 
-  async function handleEditClick(id: number) {
-    setIsEdit((prev) => !prev);
+  async function handleEditClick(commentId: number) {
+    setIsEdit(commentId);
   }
 
-  async function handleDeleteClick(id: number) {
-    if (accessToken === null) {
+  function handleCancelClick() {
+    setIsEdit(null);
+  }
+
+  async function handleSaveEdit(commentId: number, newContent: string) {
+    if (!accessToken) {
       return alert("로그인 ㄱ");
     }
 
@@ -109,15 +110,57 @@ export default function PostView({ article, comments }: PostViewProps) {
       }
 
       if ((userData as getUserData).nickname) {
-        const res = await axios.delete(`/comments/${id}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+        const res = await axios.patch(
+          `/comments/${commentId}`,
+          { content: newContent },
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+
+        if (res.status === 200) {
+          setEditedComments((prevComments) =>
+            prevComments.map((comment) =>
+              comment.id === commentId
+                ? { ...comment, content: newContent }
+                : comment
+            )
+          );
+          setIsEdit(null);
+        }
+      }
+    } catch (error: any) {
+      console.log("댓글을 수정하는 중 오류가 발생했습니다.", error);
+      if(error.response.status === 403) {
+        return alert("권한이 없음");
+        
+      }
+      alert("로그인 다시 ㄱ");
+    }
+  }
+
+  async function handleDeleteClick(commentId: number) {
+    if (!accessToken) {
+      return alert("로그인 ㄱ");
+    }
+
+    try {
+      const userData = await getUser(accessToken);
+
+      if (!userData || (userData as getUserMessage).message) {
+        alert("다시 로그인 ㄱ");
+        router.push("/mypage");
+        return;
+      }
+
+      if ((userData as getUserData).nickname) {
+        const res = await axios.delete(`/comments/${commentId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
 
         if (res.status === 200) {
           alert("삭제 완료");
-          router.push(`/boards/${id}`);
+          setEditedComments((prevComments) =>
+            prevComments.filter((comment) => comment.id !== commentId)
+          );
         }
       }
     } catch (error: any) {
@@ -128,12 +171,12 @@ export default function PostView({ article, comments }: PostViewProps) {
   }
 
   const imageSrc = article?.image
-  ? article.image.startsWith(
-      "https://sprint-fe-project.s3.ap-northeast-2.amazonaws.com"
-    )
-    ? article.image
-    : nullImg
-  : null;
+    ? article.image.startsWith(
+        "https://sprint-fe-project.s3.ap-northeast-2.amazonaws.com"
+      )
+      ? article.image
+      : nullImg
+    : null;
 
   return (
     article && (
@@ -154,7 +197,7 @@ export default function PostView({ article, comments }: PostViewProps) {
             {imageSrc && (
               <Image width={512} height={512} src={imageSrc} alt="zzz" />
             )}
-            <br></br>
+            <br />
             <span className={styles.viewPostContent}>{article.content}</span>
           </div>
         </div>
@@ -165,7 +208,7 @@ export default function PostView({ article, comments }: PostViewProps) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="댓글을 입력해주세요."
-          ></textarea>
+          />
           <div className={styles.viewAddBtnContainer}>
             <button
               className={`${styles.viewAddBtn} ${
@@ -178,14 +221,16 @@ export default function PostView({ article, comments }: PostViewProps) {
           </div>
         </div>
         <div className={styles.viewPostBottom}>
-          {comments.length > 0 ? (
-            comments.map((comment) => (
+          {editedComments.length > 0 ? (
+            editedComments.map((comment) => (
               <Comment
-                comment={comment}
                 key={comment.id}
-                isEdit={isEdit}
+                comment={comment}
+                isEdit={isEdit === comment.id}
                 onEdit={handleEditClick}
                 onDelete={handleDeleteClick}
+                onCancelEdit={handleCancelClick}
+                onSaveEdit={handleSaveEdit} // 이 줄 추가
               />
             ))
           ) : (
