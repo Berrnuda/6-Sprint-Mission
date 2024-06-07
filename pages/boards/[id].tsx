@@ -74,15 +74,12 @@ export default function PostView({ article, comments }: PostViewProps) {
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
 
-        setEditedComments((prevComments) => [
-          ...prevComments,
-          res.data,
-        ]);
+        setEditedComments((prevComments) => [res.data, ...prevComments]);
         setNewComment("");
       }
     } catch (error: any) {
       console.log("댓글을 작성하는 중 오류가 발생했습니다.", error);
-      
+
       alert("로그인 다시 ㄱ");
     }
   }
@@ -129,9 +126,8 @@ export default function PostView({ article, comments }: PostViewProps) {
       }
     } catch (error: any) {
       console.log("댓글을 수정하는 중 오류가 발생했습니다.", error);
-      if(error.response.status === 403) {
+      if (error.response.status === 403) {
         return alert("권한이 없음");
-        
       }
       alert("로그인 다시 ㄱ");
     }
