@@ -6,6 +6,7 @@ export default function Mypage() {
 
   useEffect(() => {
     window.localStorage.removeItem("accessToken");
+    window.localStorage.removeItem("profileImg");
     router.push('/signin');
   });
 }

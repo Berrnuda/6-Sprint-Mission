@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import MainLogo from "@/public/icon/main_logo.svg";
 import SmallMainLogo from "@/public/icon/main_logo_small.svg";
 import Link from "next/link";
@@ -13,7 +13,7 @@ const NavBar: React.FC = () => {
   const accessToken =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
   const profileImg =
-    typeof window !== "undefined" ? localStorage.getItem("profileImg") : null;
+    typeof window !== "undefined" ? localStorage.getItem("profileImg") : "null";
 
   return (
     <nav className={styles.navvar}>
@@ -41,23 +41,26 @@ const NavBar: React.FC = () => {
           <span>자유게시판</span>
         </Link>
         <Link
-          href="/"
+          href="/items"
           className={router.pathname === "/items" ? styles.focus : ""}
         >
           <span>중고마켓</span>
         </Link>
       </div>
+
       {accessToken === null ? (
         <Link href="/signin">
           <span>로그인</span>
         </Link>
-      ) : profileImg === null ? (
-        <Link href="/mypage">
-          <Image width={40} height={40} alt="user-icon" src={user_icon} />
-        </Link>
       ) : (
         <Link href="/mypage">
-          <Image width={40} height={40} alt="user-icon" src={profileImg} className={styles.userImg}/>
+          <Image
+            width={40}
+            height={40}
+            alt="user-icon"
+            src={profileImg === "null" ? user_icon : profileImg}
+            className={styles.userImg}
+          />
         </Link>
       )}
     </nav>
