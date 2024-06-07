@@ -14,6 +14,7 @@ import { PostViewProps, getUserData, getUserMessage } from "@/types";
 import Link from "next/link";
 import ic_back from "@/public/icon/ic_back.png";
 import reply_empty from "@/public/icon/img_reply_empty.svg";
+import nullImg from "@/public/icon/null.png";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
@@ -126,6 +127,14 @@ export default function PostView({ article, comments }: PostViewProps) {
     }
   }
 
+  const imageSrc = article?.image
+  ? article.image.startsWith(
+      "https://sprint-fe-project.s3.ap-northeast-2.amazonaws.com"
+    )
+    ? article.image
+    : nullImg
+  : null;
+
   return (
     article && (
       <div className={styles.viewBestContainer}>
@@ -142,8 +151,8 @@ export default function PostView({ article, comments }: PostViewProps) {
             <span className={styles.LikeCount}>{article.likeCount}</span>
           </div>
           <div className={styles.viewPostDes}>
-            {article.image && (
-              <Image width={512} height={512} src={article.image} alt="zzz" />
+            {imageSrc && (
+              <Image width={512} height={512} src={imageSrc} alt="zzz" />
             )}
             <br></br>
             <span className={styles.viewPostContent}>{article.content}</span>

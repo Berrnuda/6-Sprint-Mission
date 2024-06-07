@@ -22,6 +22,7 @@ export default function Comment({ comment, onEdit, onDelete, isEdit }: CommentPr
             height={32}
             alt="profile"
             src={comment.writer.image}
+            className={styles.userImg}
           />
         ) : (
           <Image width={32} height={32} alt="profile" src={user_icon} />

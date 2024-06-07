@@ -5,17 +5,24 @@ import timeString from "@/utils/timeString";
 import user_icon from "@/public/icon/user_icon.svg";
 import Link from "next/link";
 import { PostsProps } from "@/types";
-
-
+import nullImg from "@/public/icon/null.png";
 
 export default function Posts({ posts }: PostsProps) {
+  const imageSrc = posts.image
+    ? posts.image.startsWith(
+        "https://sprint-fe-project.s3.ap-northeast-2.amazonaws.com"
+      )
+      ? posts.image
+      : nullImg
+    : null;
+
   return (
     <Link href={`/boards/${posts.id}`}>
       <div key={posts.id} className={styles.postContainer}>
         <div className={styles.postsTop}>
           <span className={styles.postsTitle}>{posts.title}</span>
-          {posts.image && (
-            <Image width={72} height={72} alt="이미지" src={posts.image} />
+          {imageSrc && (
+            <Image width={72} height={72} alt="이미지" src={imageSrc} />
           )}
         </div>
         <div className={styles.postsBottom}>

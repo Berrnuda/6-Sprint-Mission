@@ -57,7 +57,7 @@ const NavBar: React.FC = () => {
         </Link>
       ) : (
         <Link href="/mypage">
-          <Image width={40} height={40} alt="user-icon" src={profileImg} />
+          <Image width={40} height={40} alt="user-icon" src={profileImg} className={styles.userImg}/>
         </Link>
       )}
     </nav>

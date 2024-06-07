@@ -45,6 +45,10 @@
   color: #3692ff;
 }
 
+.userImg {
+  border-radius: 50%;
+}
+
 @media (max-width: 1279px) {
   .navvar {
     padding: 0px 34px;
