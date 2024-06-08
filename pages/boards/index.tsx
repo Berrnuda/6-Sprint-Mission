@@ -10,6 +10,7 @@ import { GetServerSideProps } from "next";
 import { ArticlesList, BoardsProps } from "@/types";
 import { useMediaQuery } from "react-responsive";
 import Pagination from "@/components/boards/pagination";
+import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
@@ -38,6 +39,7 @@ export default function Board({ PostsData }: BoardsProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(8);
+  const router = useRouter();
 
   const isTablet = useMediaQuery({
     query: `(max-width: 1024px)`,
@@ -94,6 +96,7 @@ export default function Board({ PostsData }: BoardsProps) {
     )
       return;
     setCurrentPage(page);
+    router.push(`${router.pathname}?page=${page}`, undefined, {scroll: false});
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -117,6 +120,10 @@ export default function Board({ PostsData }: BoardsProps) {
   useEffect(() => {
     renderPageButtons(filteredData.length, isTablet, isMobile);
   }, [filteredData.length, isTablet, isMobile]);
+
+  useEffect(() => {
+    setCurrentPage(parseInt(router.query.page as string, 10) || 1);
+  }, [router.query.page]);
 
   return (
     <div className={styles.BoardContainer}>
