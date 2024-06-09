@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "@/utils/axios";
@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const [articleRes, commentsRes] = await Promise.all([
       axios.get(`/articles/${id}`),
-      axios.get(`/articles/${id}/comments?limit=99`),
+      axios.get(`/articles/${id}/comments?limit=99`), // 모든 댓글 로드
     ]);
 
     return {
@@ -39,15 +39,29 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 };
 
-export default function PostView({ article, comments }: PostViewProps) {
+export default function PostView({
+  article,
+  comments: initialComments,
+}: PostViewProps) {
   const [newComment, setNewComment] = useState<string>("");
   const [isEdit, setIsEdit] = useState<number | null>(null);
-  const [editedComments, setEditedComments] = useState(comments);
+  const [currentCommentPage, setCurrentCommentPage] = useState(1);
+  const [editedComments, setEditedComments] = useState(initialComments);
+
+  const COMMENTS_PER_PAGE = 5; // 페이지 당 댓글 수
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastCommentRef = useRef<HTMLDivElement | null>(null);
 
   const router = useRouter();
   const id = router.query["id"];
   const accessToken =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+
+  const currentComments = editedComments.slice(
+    0,
+    currentCommentPage * COMMENTS_PER_PAGE
+  );
 
   async function postComment() {
     if (!accessToken) {
@@ -166,6 +180,33 @@ export default function PostView({ article, comments }: PostViewProps) {
     }
   }
 
+  const observerCallback = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (entries[0].isIntersecting) {
+        setCurrentCommentPage((prevPage) => prevPage + 1);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(observerCallback, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (lastCommentRef.current) {
+      observer.current.observe(lastCommentRef.current);
+    }
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [observerCallback, lastCommentRef.current]);
+
   const imageSrc = article?.image
     ? article.image.startsWith(
         "https://sprint-fe-project.s3.ap-northeast-2.amazonaws.com"
@@ -217,18 +258,25 @@ export default function PostView({ article, comments }: PostViewProps) {
           </div>
         </div>
         <div className={styles.viewPostBottom}>
-          {editedComments.length > 0 ? (
-            editedComments.map((comment) => (
-              <Comment
-                key={comment.id}
-                comment={comment}
-                isEdit={isEdit === comment.id}
-                onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
-                onCancelEdit={handleCancelClick}
-                onSaveEdit={handleSaveEdit} // 이 줄 추가
-              />
-            ))
+          {currentComments.length > 0 ? (
+            currentComments.map((comment, index) => {
+              const isLastComment = currentComments.length === index + 1;
+              return (
+                <div
+                  key={comment.id}
+                  ref={isLastComment ? lastCommentRef : null} // 마지막 댓글에 ref 추가
+                >
+                  <Comment
+                    comment={comment}
+                    isEdit={isEdit === comment.id}
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteClick}
+                    onCancelEdit={handleCancelClick}
+                    onSaveEdit={handleSaveEdit}
+                  />
+                </div>
+              );
+            })
           ) : (
             <div className={styles.commentEmptyContainer}>
               <Image
