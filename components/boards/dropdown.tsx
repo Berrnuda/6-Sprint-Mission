@@ -1,13 +1,12 @@
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import arrow from "@/public/icon/ic_arrow_down.svg";
-import sort from "@/public/icon/ic_sort.svg";
-import style from "@/styles/dropdown.module.css";
+import Image from "next/image";
 import { useMediaQuery } from "react-responsive";
 
-interface DropdownProps {
-  onChange: (order: "recent" | "like") => void;
-}
+import { DropdownProps } from "@/types";
+
+import style from "@/styles/dropdown.module.css";
+import arrow from "@/public/icon/ic_arrow_down.svg";
+import sort from "@/public/icon/ic_sort.svg";
 
 export default function Dropdown({ onChange }: DropdownProps) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);

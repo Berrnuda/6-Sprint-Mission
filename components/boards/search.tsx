@@ -1,11 +1,9 @@
-import styles from "@/styles/Board.module.css";
-import searchIC from "@/public/icon/ic_Search.svg";
 import Image from "next/image";
 
-interface SearchInputProps {
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
+import { SearchInputProps } from "@/types";
+
+import styles from "@/styles/Board.module.css";
+import searchIC from "@/public/icon/ic_Search.svg";
 
 export default function SearchInput({ value, onChange }: SearchInputProps) {
   return (

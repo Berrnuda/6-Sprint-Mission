@@ -1,10 +1,11 @@
 import React from "react";
-import MainLogo from "@/public/icon/main_logo.svg";
-import SmallMainLogo from "@/public/icon/main_logo_small.svg";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Image from "next/image";
+
 import styles from "@/styles/Header.module.css";
+import MainLogo from "@/public/icon/main_logo.svg";
+import SmallMainLogo from "@/public/icon/main_logo_small.svg";
 import user_icon from "@/public/icon/user_icon.svg";
 
 const NavBar: React.FC = () => {
