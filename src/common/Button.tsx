@@ -7,7 +7,7 @@ interface LinkButtonProps {
   to?: string;
 }
 
-export default function LinkButton({ children, to = "/" }: LinkButtonProps): ReactNode {
+export default function LinkButton({ children, to = "/" }: LinkButtonProps) {
   return (
     <Link to={to}>
       <div className="button">{children}</div>
