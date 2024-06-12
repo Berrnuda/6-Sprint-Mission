@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
@@ -312,13 +311,3 @@ export default function PostView({
     )
   );
 }
-=======
-import { useRouter } from "next/router"
-
-export default function PostView() {
-    const router = useRouter();
-    const id = router.query['id'];
-
-    return <div>{id} post 페이지</div>
-}
->>>>>>> Next.js-김제완-sprint9
