@@ -4,9 +4,12 @@ import SmallMainLogo from "../assets/icon/main_logo_small.svg";
 import { Link, useLocation } from "react-router-dom";
 import "../style/header.css";
 import LinkButton from "../common/Button";
+import userIcon from "../assets/icon/user_icon.svg";
 
 export default function NavBar(): JSX.Element {
   const location = useLocation();
+  const token = localStorage.getItem("accessToken");
+
   return (
     <nav className="navvar">
       <Link to="/">
@@ -29,7 +32,11 @@ export default function NavBar(): JSX.Element {
           <span>중고마켓</span>
         </Link>
       </div>
-      <LinkButton to="/signin">로그인</LinkButton>
+        {token ? (
+          <img src={userIcon} alt="userIcon"/>
+        ) : (
+          <LinkButton to="/signin">로그인</LinkButton>
+        )}
     </nav>
   );
 }

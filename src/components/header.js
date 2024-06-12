@@ -9,8 +9,10 @@ const main_logo_small_svg_1 = __importDefault(require("../assets/icon/main_logo_
 const react_router_dom_1 = require("react-router-dom");
 require("../style/header.css");
 const Button_1 = __importDefault(require("../common/Button"));
+const user_icon_svg_1 = __importDefault(require("../assets/icon/user_icon.svg"));
 function NavBar() {
     const location = (0, react_router_dom_1.useLocation)();
+    const token = localStorage.getItem("accessToken");
     return (react_1.default.createElement("nav", { className: "navvar" },
         react_1.default.createElement(react_router_dom_1.Link, { to: "/" },
             react_1.default.createElement("img", { className: "mainlogo", src: main_logo_svg_1.default, alt: "\uB85C\uACE0" }),
@@ -23,6 +25,6 @@ function NavBar() {
                     ? "focus"
                     : "" },
                 react_1.default.createElement("span", null, "\uC911\uACE0\uB9C8\uCF13"))),
-        react_1.default.createElement(Button_1.default, { to: "/signin" }, "\uB85C\uADF8\uC778")));
+        token ? (react_1.default.createElement("img", { src: user_icon_svg_1.default, alt: "userIcon" })) : (react_1.default.createElement(Button_1.default, { to: "/signin" }, "\uB85C\uADF8\uC778"))));
 }
 exports.default = NavBar;
