@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import eyeInvisible from "../../assets/icon/eye-invisible.svg";
 import eyeVisible from "../../assets/icon/eye-visible.svg";
+import { postSignin } from "../API/API";
 
 export default function SigninForm(): JSX.Element {
   const [email, setEmail] = useState("");
@@ -10,6 +11,12 @@ export default function SigninForm(): JSX.Element {
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (token) navigate("/");
+  })
 
   function validateEmail(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,10 +45,19 @@ export default function SigninForm(): JSX.Element {
     }
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     if (validateEmail() && validatePassword()) {
-      navigate("/items");
+      try {
+        const res = await postSignin({email, password});
+        const accessToken = res.accessToken;
+        localStorage.setItem("accessToken", accessToken);
+        alert("로그인 성공");
+        navigate("/");
+      } catch (err) {
+        console.error(err);
+        alert(err);
+      }
     }
   }
 

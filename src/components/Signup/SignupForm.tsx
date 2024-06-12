@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import eyeInvisible from "../../assets/icon/eye-invisible.svg";
 import eyeVisible from "../../assets/icon/eye-visible.svg";
+import { postSignup } from "../API/API";
 
 export default function SignupForm(): JSX.Element {
   const [email, setEmail] = useState<string>("");
@@ -10,11 +11,17 @@ export default function SignupForm(): JSX.Element {
   const [nicknameError, setNicknameError] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
-  const [passwordConfirm, setPasswordConfirm] = useState<string>("");
+  const [passwordConfirmation, setPasswordConfirm] = useState<string>("");
   const [passwordConfirmError, setPasswordConfirmError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (token) navigate("/");
+  })
 
   function validateEmail(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,7 +61,7 @@ export default function SignupForm(): JSX.Element {
   }
 
   function validatePasswordConfirm(): boolean {
-    if (password !== passwordConfirm) {
+    if (password !== passwordConfirmation) {
       setPasswordConfirmError("비밀번호가 일치하지 않습니다.");
       return false;
     } else {
@@ -63,7 +70,7 @@ export default function SignupForm(): JSX.Element {
     }
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     if (
       validateEmail() &&
@@ -71,7 +78,14 @@ export default function SignupForm(): JSX.Element {
       validatePassword() &&
       validatePasswordConfirm()
     ) {
-      navigate("/items");
+      try {
+        await postSignup({email, nickname, password, passwordConfirmation});
+        alert("회원가입이 완료되었습니다.");
+        navigate("/signin");
+      } catch (error) {
+        console.log(error);
+        alert(error);
+      }
     }
   }
 
@@ -165,7 +179,7 @@ export default function SignupForm(): JSX.Element {
           type={showPasswordConfirm ? "text" : "password"}
           placeholder="비밀번호를 다시 한 번 입력해 주세요."
           className="signin-input"
-          value={passwordConfirm}
+          value={passwordConfirmation}
           onChange={(e) => setPasswordConfirm(e.target.value)}
           onBlur={validatePasswordConfirm}
           style={{
