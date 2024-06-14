@@ -88,6 +88,7 @@ function AuthProvider({ children }) {
         });
     }
     function logout() {
+        // eslint-disable-next-line require-yield
         return __awaiter(this, void 0, void 0, function* () {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
