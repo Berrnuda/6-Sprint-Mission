@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import eyeInvisible from "../../assets/icon/eye-invisible.svg";
 import eyeVisible from "../../assets/icon/eye-visible.svg";
 import { postSignup } from "../API/API";
+import { useAuth } from "../../context/AuthProvider";
 
 export default function SignupForm(): JSX.Element {
   const [email, setEmail] = useState<string>("");
@@ -14,14 +15,15 @@ export default function SignupForm(): JSX.Element {
   const [passwordConfirmation, setPasswordConfirm] = useState<string>("");
   const [passwordConfirmError, setPasswordConfirmError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState<boolean>(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] =
+    useState<boolean>(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+  const { user } = useAuth();
 
-    if (token) navigate("/");
-  })
+  useEffect(() => {
+    if (user) navigate("/");
+  }, [user, navigate]);
 
   function validateEmail(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -70,7 +72,9 @@ export default function SignupForm(): JSX.Element {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> {
     e.preventDefault();
     if (
       validateEmail() &&
@@ -79,7 +83,7 @@ export default function SignupForm(): JSX.Element {
       validatePasswordConfirm()
     ) {
       try {
-        await postSignup({email, nickname, password, passwordConfirmation});
+        await postSignup({ email, nickname, password, passwordConfirmation });
         alert("회원가입이 완료되었습니다.");
         navigate("/signin");
       } catch (error) {

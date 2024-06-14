@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import axios from "../components/API/axios";
 import { useNavigate } from "react-router-dom";
 
 type AuthProps = {
@@ -24,6 +23,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const BASE_URL = "https://panda-market-api.vercel.app";
+
 export function AuthProvider({ children }: AuthProps) {
   const [values, setValues] = useState<{
     user: User | null;
@@ -36,21 +37,29 @@ export function AuthProvider({ children }: AuthProps) {
   const accessToken =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
-  async function getUser() {
+  async function getUser(token : string | null = null) {
+    let key;
+    if (token) key = token;
+    else key = accessToken;
+
     setValues((prev) => ({
       ...prev,
       isPending: true,
     }));
-    let nextUser: User | null;
+    let nextUser: User | null = null;
     try {
-      const res = await axios.get("/users/me", {
+      const response = await fetch(`${BASE_URL}/users/me`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${key}`,
         },
       });
-      nextUser = res.data;
-    } catch (e: any) {
-      if (e.response.status === 401) return;
+      if (response.ok) {
+        nextUser = await response.json();
+      } else if (response.status === 401) {
+        return;
+      }
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
     } finally {
       setValues((prev) => ({
         ...prev,
@@ -61,19 +70,31 @@ export function AuthProvider({ children }: AuthProps) {
   }
 
   async function login(email: string, password: string) {
-    const res = await axios.post("/auth/signIn", {
-      email,
-      password,
-    });
-    const { accessToken, refreshToken } = res.data;
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-    await getUser();
+    try {
+      const response = await fetch(`${BASE_URL}/auth/signIn`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const { accessToken, refreshToken } = await response.json();
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        await getUser(accessToken);
+      } else {
+        console.error("Failed to login:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
   }
 
   async function logout() {
-    window.localStorage.removeItem("accessToken");
-    window.localStorage.removeItem("refreshToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 
     setValues((prev) => ({
       ...prev,
@@ -115,7 +136,7 @@ export function useAuth(required: boolean | null = null) {
     } else if (!required && context.user && !context.isPending) {
       navigate("/");
     }
-  }, [context.user, context.isPending, required]);
+  }, [context.user, context.isPending, required, navigate]);
 
   return context;
 }

@@ -31,15 +31,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useAuth = exports.AuthProvider = void 0;
 const react_1 = __importStar(require("react"));
-const axios_1 = __importDefault(require("../components/API/axios"));
 const react_router_dom_1 = require("react-router-dom");
 const AuthContext = (0, react_1.createContext)(null);
+const BASE_URL = "https://panda-market-api.vercel.app";
 function AuthProvider({ children }) {
     const [values, setValues] = (0, react_1.useState)({
         user: null,
@@ -47,20 +44,29 @@ function AuthProvider({ children }) {
     });
     const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
     function getUser() {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, arguments, void 0, function* (token = null) {
+            let key;
+            if (token)
+                key = token;
+            else
+                key = accessToken;
             setValues((prev) => (Object.assign(Object.assign({}, prev), { isPending: true })));
-            let nextUser;
+            let nextUser = null;
             try {
-                const res = yield axios_1.default.get("/users/me", {
+                const response = yield fetch(`${BASE_URL}/users/me`, {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
+                        Authorization: `Bearer ${key}`,
                     },
                 });
-                nextUser = res.data;
-            }
-            catch (e) {
-                if (e.response.status === 401)
+                if (response.ok) {
+                    nextUser = yield response.json();
+                }
+                else if (response.status === 401) {
                     return;
+                }
+            }
+            catch (error) {
+                console.error("Failed to fetch user:", error);
             }
             finally {
                 setValues((prev) => (Object.assign(Object.assign({}, prev), { user: nextUser, isPending: false })));
@@ -69,20 +75,33 @@ function AuthProvider({ children }) {
     }
     function login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield axios_1.default.post("/auth/signIn", {
-                email,
-                password,
-            });
-            const { accessToken, refreshToken } = res.data;
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
-            yield getUser();
+            try {
+                const response = yield fetch(`${BASE_URL}/auth/signIn`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                if (response.ok) {
+                    const { accessToken, refreshToken } = yield response.json();
+                    localStorage.setItem("accessToken", accessToken);
+                    localStorage.setItem("refreshToken", refreshToken);
+                    yield getUser(accessToken);
+                }
+                else {
+                    console.error("Failed to login:", response.statusText);
+                }
+            }
+            catch (error) {
+                console.error("Error during login:", error);
+            }
         });
     }
     function logout() {
         return __awaiter(this, void 0, void 0, function* () {
-            window.localStorage.removeItem("accessToken");
-            window.localStorage.removeItem("refreshToken");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
             setValues((prev) => (Object.assign(Object.assign({}, prev), { user: null })));
         });
     }
@@ -113,7 +132,7 @@ function useAuth(required = null) {
         else if (!required && context.user && !context.isPending) {
             navigate("/");
         }
-    }, [context.user, context.isPending, required]);
+    }, [context.user, context.isPending, required, navigate]);
     return context;
 }
 exports.useAuth = useAuth;

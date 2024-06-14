@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import eyeInvisible from "../../assets/icon/eye-invisible.svg";
 import eyeVisible from "../../assets/icon/eye-visible.svg";
 import { postSignin } from "../API/API";
+import { useAuth } from "../../context/AuthProvider";
 
 export default function SigninForm(): JSX.Element {
   const [email, setEmail] = useState("");
@@ -12,11 +13,11 @@ export default function SigninForm(): JSX.Element {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+  const { user, login } = useAuth();
 
-    if (token) navigate("/");
-  })
+  useEffect(() => {
+    if (user) navigate("/");
+  }, [user, navigate]);
 
   function validateEmail(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,14 +46,14 @@ export default function SigninForm(): JSX.Element {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> {
     e.preventDefault();
     if (validateEmail() && validatePassword()) {
       try {
-        const res = await postSignin({email, password});
-        const accessToken = res.accessToken;
-        localStorage.setItem("accessToken", accessToken);
-        alert("로그인 성공");
+        // const res = await postSignin({email, password});
+        await login(email, password);
         navigate("/");
       } catch (err) {
         console.error(err);

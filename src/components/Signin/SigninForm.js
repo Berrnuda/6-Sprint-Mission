@@ -39,7 +39,7 @@ const react_1 = __importStar(require("react"));
 const react_router_dom_1 = require("react-router-dom");
 const eye_invisible_svg_1 = __importDefault(require("../../assets/icon/eye-invisible.svg"));
 const eye_visible_svg_1 = __importDefault(require("../../assets/icon/eye-visible.svg"));
-const API_1 = require("../API/API");
+const AuthProvider_1 = require("../../context/AuthProvider");
 function SigninForm() {
     const [email, setEmail] = (0, react_1.useState)("");
     const [emailError, setEmailError] = (0, react_1.useState)("");
@@ -47,11 +47,11 @@ function SigninForm() {
     const [passwordError, setPasswordError] = (0, react_1.useState)("");
     const [showPassword, setShowPassword] = (0, react_1.useState)(false);
     const navigate = (0, react_router_dom_1.useNavigate)();
+    const { user, login } = (0, AuthProvider_1.useAuth)();
     (0, react_1.useEffect)(() => {
-        const token = localStorage.getItem("accessToken");
-        if (token)
+        if (user)
             navigate("/");
-    });
+    }, [user, navigate]);
     function validateEmail() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email) {
@@ -86,10 +86,8 @@ function SigninForm() {
             e.preventDefault();
             if (validateEmail() && validatePassword()) {
                 try {
-                    const res = yield (0, API_1.postSignin)({ email, password });
-                    const accessToken = res.accessToken;
-                    localStorage.setItem("accessToken", accessToken);
-                    alert("로그인 성공");
+                    // const res = await postSignin({email, password});
+                    yield login(email, password);
                     navigate("/");
                 }
                 catch (err) {

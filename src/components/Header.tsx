@@ -5,10 +5,12 @@ import { Link, useLocation } from "react-router-dom";
 import "../style/header.css";
 import LinkButton from "../common/Button";
 import userIcon from "../assets/icon/user_icon.svg";
+import { useAuth } from "../context/AuthProvider";
 
 export default function NavBar(): JSX.Element {
   const location = useLocation();
   const token = localStorage.getItem("accessToken");
+  const {user, logout} = useAuth();
 
   return (
     <nav className="navvar">
@@ -32,7 +34,7 @@ export default function NavBar(): JSX.Element {
           <span>중고마켓</span>
         </Link>
       </div>
-        {token ? (
+        {user ? (
           <img src={userIcon} alt="userIcon"/>
         ) : (
           <LinkButton to="/signin">로그인</LinkButton>
