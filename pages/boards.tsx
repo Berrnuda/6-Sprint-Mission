@@ -1,20 +1,20 @@
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
 
-import { List, BoardsProps } from "@/types";
-import BestPost from "@/components/bestPost";
-import Posts from "@/components/posts";
-import SearchInput from "@/components/search";
-import Dropdown from "@/components/dropdown";
+import { ArticlesList, BoardsProps } from "@/types";
 import LinkButton from "@/utils/Button";
 import axios from "@/utils/axios";
 
 import styles from "@/styles/Board.module.css";
+import BestPost from "@/components/boards/bestPost";
+import SearchInput from "@/components/boards/search";
+import Dropdown from "@/components/boards/dropdown";
+import Posts from "@/components/boards/posts";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
     const res = await axios.get("/articles");
-    const PostsData: List[] = res.data.list ?? [];
+    const PostsData: ArticlesList[] = res.data.list ?? [];
 
     return {
       props: {
@@ -33,14 +33,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 export default function Board({ PostsData }: BoardsProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [posts, setPosts] = useState<List[]>(PostsData);
+  const [posts, setPosts] = useState<ArticlesList[]>(PostsData);
   const [order, setOrder] = useState<"recent" | "like">("recent");
 
   const handleSortOrderChange = (selectedOrder: "recent" | "like"): void => {
     setOrder(selectedOrder);
   };
 
-  const sortData = (data: List[], order: "recent" | "like"): List[] => {
+  const sortData = (data: ArticlesList[], order: "recent" | "like"): ArticlesList[] => {
     if (order === "recent") {
       return data
         .slice()
