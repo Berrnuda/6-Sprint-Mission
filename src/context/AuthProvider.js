@@ -1,4 +1,3 @@
-"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -97,6 +96,7 @@ function AuthProvider({ children }) {
     }
     (0, react_1.useEffect)(() => {
         getUser();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (react_1.default.createElement(AuthContext.Provider, { value: {
             user: values.user,

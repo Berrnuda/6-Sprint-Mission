@@ -1,4 +1,3 @@
-"use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -13,7 +12,6 @@ const user_icon_svg_1 = __importDefault(require("../assets/icon/user_icon.svg"))
 const AuthProvider_1 = require("../context/AuthProvider");
 function NavBar() {
     const location = (0, react_router_dom_1.useLocation)();
-    const token = localStorage.getItem("accessToken");
     const { user, logout } = (0, AuthProvider_1.useAuth)();
     return (react_1.default.createElement("nav", { className: "navvar" },
         react_1.default.createElement(react_router_dom_1.Link, { to: "/" },
