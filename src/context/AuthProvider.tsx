@@ -37,7 +37,7 @@ export function AuthProvider({ children }: AuthProps) {
   const accessToken =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
-  async function getUser(token : string | null = null) {
+  async function getUser(token: string | null = null) {
     let key;
     if (token) key = token;
     else key = accessToken;
@@ -70,26 +70,18 @@ export function AuthProvider({ children }: AuthProps) {
   }
 
   async function login(email: string, password: string) {
-    try {
-      const response = await fetch(`${BASE_URL}/auth/signIn`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    const response = await fetch(`${BASE_URL}/auth/signIn`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (response.ok) {
-        const { accessToken, refreshToken } = await response.json();
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        await getUser(accessToken);
-      } else {
-        console.error("Failed to login:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-    }
+    const { accessToken, refreshToken } = await response.json();
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    await getUser(accessToken);
   }
 
   async function logout() {

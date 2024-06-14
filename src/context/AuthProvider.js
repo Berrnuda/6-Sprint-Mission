@@ -75,27 +75,17 @@ function AuthProvider({ children }) {
     }
     function login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield fetch(`${BASE_URL}/auth/signIn`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
-                if (response.ok) {
-                    const { accessToken, refreshToken } = yield response.json();
-                    localStorage.setItem("accessToken", accessToken);
-                    localStorage.setItem("refreshToken", refreshToken);
-                    yield getUser(accessToken);
-                }
-                else {
-                    console.error("Failed to login:", response.statusText);
-                }
-            }
-            catch (error) {
-                console.error("Error during login:", error);
-            }
+            const response = yield fetch(`${BASE_URL}/auth/signIn`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+            const { accessToken, refreshToken } = yield response.json();
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            yield getUser(accessToken);
         });
     }
     function logout() {

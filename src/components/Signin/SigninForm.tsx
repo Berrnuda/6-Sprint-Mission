@@ -1,108 +1,81 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import eyeInvisible from "../../assets/icon/eye-invisible.svg";
 import eyeVisible from "../../assets/icon/eye-visible.svg";
-import { postSignin } from "../API/API";
 import { useAuth } from "../../context/AuthProvider";
 
+const schema = yup.object({
+  email: yup.string().email("올바른 이메일 형식이 아닙니다.").required("이메일을 입력하세요."),
+  password: yup.string().min(8, "비밀번호는 최소 8자 이상이어야 합니다.").required("비밀번호를 입력하세요."),
+}).required();
+
+type SigninFormValues = {
+  email: string;
+  password: string;
+};
+
 export default function SigninForm(): JSX.Element {
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SigninFormValues>({
+    resolver: yupResolver(schema),
+    mode: "onChange",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
   const { user, login } = useAuth();
 
   useEffect(() => {
     if (user) navigate("/");
   }, [user, navigate]);
 
-  function validateEmail(): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError("이메일을 입력하세요.");
-      return false;
-    } else if (!emailRegex.test(email)) {
-      setEmailError("올바른 이메일 형식이 아닙니다.");
-      return false;
-    } else {
-      setEmailError("");
-      return true;
+  const onSubmit: SubmitHandler<SigninFormValues> = async (data) => {
+    try {
+      await login(data.email, data.password);
+      navigate("/");
+    } catch (err: any) {
+      console.error(err);
+      alert("로그인에 실패했습니다.");
     }
-  }
-
-  function validatePassword(): boolean {
-    if (!password) {
-      setPasswordError("비밀번호를 입력하세요.");
-      return false;
-    } else if (password.length < 8) {
-      setPasswordError("비밀번호는 최소 8자 이상이어야 합니다.");
-      return false;
-    } else {
-      setPasswordError("");
-      return true;
-    }
-  }
-
-  async function handleSubmit(
-    e: React.FormEvent<HTMLFormElement>
-  ): Promise<void> {
-    e.preventDefault();
-    if (validateEmail() && validatePassword()) {
-      try {
-        // const res = await postSignin({email, password});
-        await login(email, password);
-        navigate("/");
-      } catch (err) {
-        console.error(err);
-        alert(err);
-      }
-    }
-  }
+  };
 
   function togglePasswordVisibility(): void {
     setShowPassword(!showPassword);
   }
 
   return (
-    <form id="signinForm" className="signin-form" onSubmit={handleSubmit}>
+    <form id="signinForm" className="signin-form" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="email" className="signin-label">
-          이메일
-        </label>
+        <label htmlFor="email" className="signin-label">이메일</label>
         <input
           id="email"
-          name="email"
           type="email"
           placeholder="이메일을 입력해 주세요."
           className="signin-input"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onBlur={validateEmail}
-          style={{ border: emailError ? "1px solid #f74747" : "none" }}
+          {...register("email")}
+          style={{ border: errors.email ? "1px solid #f74747" : "none" }}
         />
-        {emailError && (
+        {errors.email && (
           <span id="email-Error" className="Error-message">
-            {emailError}
+            {errors.email.message}
           </span>
         )}
       </div>
       <div className="signin-pwd">
-        <label htmlFor="pwd" className="signin-label">
-          비밀번호
-        </label>
+        <label htmlFor="password" className="signin-label">비밀번호</label>
         <input
-          id="pwd"
-          name="pwd"
+          id="password"
           type={showPassword ? "text" : "password"}
           placeholder="비밀번호를 입력해 주세요."
           className="signin-input"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onBlur={validatePassword}
-          style={{ border: passwordError ? "1px solid #f74747" : "none" }}
+          {...register("password")}
+          style={{ border: errors.password ? "1px solid #f74747" : "none" }}
         />
         <img
           id="pwd-toggle"
@@ -111,15 +84,13 @@ export default function SigninForm(): JSX.Element {
           alt="비밀번호 토글"
           onClick={togglePasswordVisibility}
         />
-        {passwordError && (
+        {errors.password && (
           <span id="pwd-Error" className="Error-message">
-            {passwordError}
+            {errors.password.message}
           </span>
         )}
       </div>
-      <button type="submit" className="signin-btn btn">
-        로그인
-      </button>
+      <button type="submit" className="signin-btn btn">로그인</button>
     </form>
   );
 }
