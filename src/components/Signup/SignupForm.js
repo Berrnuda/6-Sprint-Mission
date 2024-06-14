@@ -37,19 +37,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importStar(require("react"));
 const react_router_dom_1 = require("react-router-dom");
+const react_hook_form_1 = require("react-hook-form");
+const yup_1 = require("@hookform/resolvers/yup");
+const yup = __importStar(require("yup"));
 const eye_invisible_svg_1 = __importDefault(require("../../assets/icon/eye-invisible.svg"));
 const eye_visible_svg_1 = __importDefault(require("../../assets/icon/eye-visible.svg"));
 const API_1 = require("../API/API");
 const AuthProvider_1 = require("../../context/AuthProvider");
+const schema = yup.object({
+    email: yup.string().email("올바른 이메일 형식이 아닙니다.").required("이메일을 입력하세요."),
+    nickname: yup.string().required("닉네임을 입력하세요."),
+    password: yup
+        .string()
+        .min(8, "비밀번호는 최소 8자 이상이어야 합니다.")
+        .required("비밀번호를 입력하세요."),
+    passwordConfirmation: yup
+        .string()
+        .oneOf([yup.ref("password"), undefined], "비밀번호가 일치하지 않습니다.")
+        .required("비밀번호 확인을 입력하세요."),
+}).required();
 function SignupForm() {
-    const [email, setEmail] = (0, react_1.useState)("");
-    const [emailError, setEmailError] = (0, react_1.useState)("");
-    const [nickname, setNickname] = (0, react_1.useState)("");
-    const [nicknameError, setNicknameError] = (0, react_1.useState)("");
-    const [password, setPassword] = (0, react_1.useState)("");
-    const [passwordError, setPasswordError] = (0, react_1.useState)("");
-    const [passwordConfirmation, setPasswordConfirm] = (0, react_1.useState)("");
-    const [passwordConfirmError, setPasswordConfirmError] = (0, react_1.useState)("");
+    const { register, handleSubmit, formState: { errors }, } = (0, react_hook_form_1.useForm)({
+        resolver: (0, yup_1.yupResolver)(schema),
+        mode: "onChange",
+    });
     const [showPassword, setShowPassword] = (0, react_1.useState)(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = (0, react_1.useState)(false);
     const navigate = (0, react_router_dom_1.useNavigate)();
@@ -58,101 +69,42 @@ function SignupForm() {
         if (user)
             navigate("/");
     }, [user, navigate]);
-    function validateEmail() {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email) {
-            setEmailError("이메일을 입력하세요.");
-            return false;
+    const onSubmit = (data) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield (0, API_1.postSignup)(data);
+            alert("회원가입이 완료되었습니다.");
+            navigate("/signin");
         }
-        else if (!emailRegex.test(email)) {
-            setEmailError("올바른 이메일 형식이 아닙니다.");
-            return false;
+        catch (error) {
+            console.error(error);
+            alert("회원가입에 실패했습니다.");
         }
-        else {
-            setEmailError("");
-            return true;
-        }
-    }
-    function validateNickname() {
-        if (!nickname) {
-            setNicknameError("닉네임을 입력하세요.");
-            return false;
-        }
-        else {
-            setNicknameError("");
-            return true;
-        }
-    }
-    function validatePassword() {
-        if (!password) {
-            setPasswordError("비밀번호를 입력하세요.");
-            return false;
-        }
-        else if (password.length < 8) {
-            setPasswordError("비밀번호는 최소 8자 이상이어야 합니다.");
-            return false;
-        }
-        else {
-            setPasswordError("");
-            return true;
-        }
-    }
-    function validatePasswordConfirm() {
-        if (password !== passwordConfirmation) {
-            setPasswordConfirmError("비밀번호가 일치하지 않습니다.");
-            return false;
-        }
-        else {
-            setPasswordConfirmError("");
-            return true;
-        }
-    }
-    function handleSubmit(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            e.preventDefault();
-            if (validateEmail() &&
-                validateNickname() &&
-                validatePassword() &&
-                validatePasswordConfirm()) {
-                try {
-                    yield (0, API_1.postSignup)({ email, nickname, password, passwordConfirmation });
-                    alert("회원가입이 완료되었습니다.");
-                    navigate("/signin");
-                }
-                catch (error) {
-                    console.log(error);
-                    alert(error);
-                }
-            }
-        });
-    }
+    });
     function togglePasswordVisibility() {
         setShowPassword(!showPassword);
     }
     function togglePasswordConfirmVisibility() {
         setShowPasswordConfirm(!showPasswordConfirm);
     }
-    return (react_1.default.createElement("form", { id: "signupForm", className: "signin-form", onSubmit: handleSubmit },
+    return (react_1.default.createElement("form", { id: "signupForm", className: "signin-form", onSubmit: handleSubmit(onSubmit) },
         react_1.default.createElement("div", null,
             react_1.default.createElement("label", { htmlFor: "email", className: "signin-label" }, "\uC774\uBA54\uC77C"),
-            react_1.default.createElement("input", { id: "email", name: "email", type: "email", placeholder: "\uC774\uBA54\uC77C\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input", value: email, onChange: (e) => setEmail(e.target.value), onBlur: validateEmail, style: { border: emailError ? "1px solid #f74747" : "none" } }),
-            emailError && (react_1.default.createElement("span", { id: "email-Error", className: "Error-message" }, emailError))),
+            react_1.default.createElement("input", Object.assign({ id: "email", type: "email", placeholder: "\uC774\uBA54\uC77C\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input" }, register("email"), { style: { border: errors.email ? "1px solid #f74747" : "none" } })),
+            errors.email && (react_1.default.createElement("span", { id: "email-Error", className: "Error-message" }, errors.email.message))),
         react_1.default.createElement("div", null,
             react_1.default.createElement("label", { htmlFor: "nickname", className: "signin-label" }, "\uB2C9\uB124\uC784"),
-            react_1.default.createElement("input", { id: "nickname", name: "nickname", type: "text", placeholder: "\uB2C9\uB124\uC784\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input", value: nickname, onChange: (e) => setNickname(e.target.value), onBlur: validateNickname, style: { border: nicknameError ? "1px solid #f74747" : "none" } }),
-            nicknameError && (react_1.default.createElement("span", { id: "nickname-Error", className: "Error-message" }, nicknameError))),
+            react_1.default.createElement("input", Object.assign({ id: "nickname", type: "text", placeholder: "\uB2C9\uB124\uC784\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input" }, register("nickname"), { style: { border: errors.nickname ? "1px solid #f74747" : "none" } })),
+            errors.nickname && (react_1.default.createElement("span", { id: "nickname-Error", className: "Error-message" }, errors.nickname.message))),
         react_1.default.createElement("div", { className: "signin-pwd" },
-            react_1.default.createElement("label", { htmlFor: "pwd", className: "signin-label" }, "\uBE44\uBC00\uBC88\uD638"),
-            react_1.default.createElement("input", { id: "pwd", name: "pwd", type: showPassword ? "text" : "password", placeholder: "\uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input", value: password, onChange: (e) => setPassword(e.target.value), onBlur: validatePassword, style: { border: passwordError ? "1px solid #f74747" : "none" } }),
-            react_1.default.createElement("img", { id: "pwd-toggle", src: showPassword ? eye_visible_svg_1.default : eye_invisible_svg_1.default, className: "pwd-toggle", alt: "\uBE44\uBC00\uBC88\uD638 \uD1A0\uAE00", onClick: togglePasswordVisibility }),
-            passwordError && (react_1.default.createElement("span", { id: "pwd-Error", className: "Error-message" }, passwordError))),
+            react_1.default.createElement("label", { htmlFor: "password", className: "signin-label" }, "\uBE44\uBC00\uBC88\uD638"),
+            react_1.default.createElement("input", Object.assign({ id: "password", type: showPassword ? "text" : "password", placeholder: "\uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input" }, register("password"), { style: { border: errors.password ? "1px solid #f74747" : "none" } })),
+            react_1.default.createElement("img", { id: "password-toggle", src: showPassword ? eye_visible_svg_1.default : eye_invisible_svg_1.default, className: "pwd-toggle", alt: "\uBE44\uBC00\uBC88\uD638 \uD1A0\uAE00", onClick: togglePasswordVisibility }),
+            errors.password && (react_1.default.createElement("span", { id: "password-Error", className: "Error-message" }, errors.password.message))),
         react_1.default.createElement("div", { className: "signin-pwd" },
-            react_1.default.createElement("label", { htmlFor: "pwd-same", className: "signin-label" }, "\uBE44\uBC00\uBC88\uD638 \uD655\uC778"),
-            react_1.default.createElement("input", { id: "pwd-same", name: "pwd-same", type: showPasswordConfirm ? "text" : "password", placeholder: "\uBE44\uBC00\uBC88\uD638\uB97C \uB2E4\uC2DC \uD55C \uBC88 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input", value: passwordConfirmation, onChange: (e) => setPasswordConfirm(e.target.value), onBlur: validatePasswordConfirm, style: {
-                    border: passwordConfirmError ? "1px solid #f74747" : "none",
-                } }),
-            react_1.default.createElement("img", { id: "pwd-same-toggle", src: showPasswordConfirm ? eye_visible_svg_1.default : eye_invisible_svg_1.default, className: "pwd-toggle", alt: "\uBE44\uBC00\uBC88\uD638 \uD1A0\uAE00", onClick: togglePasswordConfirmVisibility }),
-            passwordConfirmError && (react_1.default.createElement("span", { id: "pwd-same-Error", className: "Error-message" }, passwordConfirmError))),
+            react_1.default.createElement("label", { htmlFor: "passwordConfirmation", className: "signin-label" }, "\uBE44\uBC00\uBC88\uD638 \uD655\uC778"),
+            react_1.default.createElement("input", Object.assign({ id: "passwordConfirmation", type: showPasswordConfirm ? "text" : "password", placeholder: "\uBE44\uBC00\uBC88\uD638\uB97C \uB2E4\uC2DC \uD55C \uBC88 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", className: "signin-input" }, register("passwordConfirmation"), { style: { border: errors.passwordConfirmation ? "1px solid #f74747" : "none" } })),
+            react_1.default.createElement("img", { id: "passwordConfirmation-toggle", src: showPasswordConfirm ? eye_visible_svg_1.default : eye_invisible_svg_1.default, className: "pwd-toggle", alt: "\uBE44\uBC00\uBC88\uD638 \uD1A0\uAE00", onClick: togglePasswordConfirmVisibility }),
+            errors.passwordConfirmation && (react_1.default.createElement("span", { id: "passwordConfirmation-Error", className: "Error-message" }, errors.passwordConfirmation.message))),
         react_1.default.createElement("button", { type: "submit", className: "signin-btn btn" }, "\uD68C\uC6D0\uAC00\uC785")));
 }
 exports.default = SignupForm;
