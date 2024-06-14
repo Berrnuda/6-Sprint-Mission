@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const res = await axios.get("/articles?pageSize=99");
+    const res = await axios.get("/articles?pageSize=9999");
     const PostsData: ArticlesList[] = res.data.list ?? [];
 
     return {
