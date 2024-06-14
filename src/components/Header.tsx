@@ -35,7 +35,7 @@ export default function NavBar(): JSX.Element {
         </Link>
       </div>
         {user ? (
-          <img src={userIcon} alt="userIcon"/>
+          <img src={userIcon} alt="userIcon" onClick={logout}/>
         ) : (
           <LinkButton to="/signin">로그인</LinkButton>
         )}

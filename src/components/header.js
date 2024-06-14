@@ -27,6 +27,6 @@ function NavBar() {
                     ? "focus"
                     : "" },
                 react_1.default.createElement("span", null, "\uC911\uACE0\uB9C8\uCF13"))),
-        user ? (react_1.default.createElement("img", { src: user_icon_svg_1.default, alt: "userIcon" })) : (react_1.default.createElement(Button_1.default, { to: "/signin" }, "\uB85C\uADF8\uC778"))));
+        user ? (react_1.default.createElement("img", { src: user_icon_svg_1.default, alt: "userIcon", onClick: logout })) : (react_1.default.createElement(Button_1.default, { to: "/signin" }, "\uB85C\uADF8\uC778"))));
 }
 exports.default = NavBar;
