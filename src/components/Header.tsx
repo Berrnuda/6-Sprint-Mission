@@ -9,7 +9,6 @@ import { useAuth } from "../context/AuthProvider";
 
 export default function NavBar(): JSX.Element {
   const location = useLocation();
-  const token = localStorage.getItem("accessToken");
   const {user, logout} = useAuth();
 
   return (
